@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lifeguard Rotation Calculator</title>
+    
+    <!-- Internal CSS -->
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f4f4f9;
+        }
+
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+
+        form {
+            margin: 20px auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            background-color: #fff;
+            max-width: 400px;
+            border-radius: 8px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        select, button {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        button {
+            background-color: #28a745;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #218838;
+        }
+
+        h2 {
+            color: #444;
+        }
+
+        #rotationOutput {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #e9ecef;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Lifeguard Rotation Calculator</h1>
+    
+    <form id="rotationForm">
+        <label for="start-time">Shift Start:</label>
+        <select id="start-time">
+            <option value="7">7:00 AM</option>
+            <option value="9">9:00 AM</option>
+            <option value="11">11:00 AM</option>
+            <option value="14">2:00 PM</option>
+            <option value="16">4:00 PM</option>
+            <option value="17">5:00 PM</option>
+            <option value="19">7:00 PM</option>
+        </select>
+
+        <label for="end-time">Shift End:</label>
+        <select id="end-time">
+            <option value="9">9:00 AM</option>
+            <option value="11">11:00 AM</option>
+            <option value="14">2:00 PM</option>
+            <option value="16">4:00 PM</option>
+            <option value="17">5:00 PM</option>
+            <option value="19">7:00 PM</option>
+            <option value="22">10:00 PM</option>
+        </select>
+
+        <label for="lifeguard-count">Number of Lifeguards:</label>
+        <select id="lifeguard-count">
+            <option value="2">2 Lifeguards</option>
+            <option value="3">3 Lifeguards</option>
+        </select>
+
+        <button type="button" onclick="calculateRotation()">Calculate Rotation</button>
+    </form>
+
+    <h2>Rotation Schedule:</h2>
+    <div id="rotationOutput"></div>
+
+    <!-- Internal JavaScript -->
+    <script>
+        function calculateRotation() {
+            const startTime = parseInt(document.getElementById('start-time').value);
+            const endTime = parseInt(document.getElementById('end-time').value);
+            const lifeguardCount = parseInt(document.getElementById('lifeguard-count').value);
+
+            const workInterval = 0.5; // 30 minutes of work
+            const breakInterval = (lifeguardCount === 2) ? 0.5 : 1.0; // 30 minutes break for 2 lifeguards, 1 hour break for 3 lifeguards
+
+            let output = '';
+
+            // Generate rotation schedules based on the number of lifeguards
+            for (let scheduleNum = 0; scheduleNum < lifeguardCount; scheduleNum++) {
+                let currentTime = startTime + (scheduleNum * workInterval);
+                let rotationCount = 1;
+
+                output += `<h3>Rotation Schedule ${scheduleNum + 1}</h3>`;
+
+                while (currentTime < endTime) {
+                    let nextTime = currentTime + workInterval;
+
+                    // Only show the working period
+                    if (nextTime <= endTime) {
+                        const shiftStart = formatTime(currentTime);
+                        const shiftEnd = formatTime(nextTime);
+                        output += `Rotation ${rotationCount}: ${shiftStart} - ${shiftEnd}<br>`;
+                        rotationCount++;
+                    }
+
+                    // Move to the next rotation (work + break)
+                    currentTime = nextTime + breakInterval;
+                }
+
+                output += '<br>'; // Add space between schedules
+            }
+
+            // Display output
+            document.getElementById('rotationOutput').innerHTML = output;
+        }
+
+        // Helper function to format time in AM/PM format
+        function formatTime(time) {
+            const hour = Math.floor(time);
+            const minute = (time % 1 === 0.5) ? '30' : '00';
+            const suffix = (hour >= 12) ? 'PM' : 'AM';
+            const formattedHour = (hour > 12) ? hour - 12 : (hour === 0 ? 12 : hour);
+            return `${formattedHour}:${minute} ${suffix}`;
+        }
+    </script>
+</body>
+</html>
